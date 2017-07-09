@@ -1,0 +1,21 @@
+{
+    "name": "malcanek/idoklad-v2",
+    "description": "PHP třída pro ulehčení požadavků na iDoklad api v2.",
+    "keywords": ["idoklad", "fakturace"],
+    "homepage": "https://github.com/malcanek/iDoklad-v2",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Jan Malcánek",
+            "email": "jan@malcanek.cz",
+            "homepage": "http://www.malcanek.cz",
+            "role": "Author"
+        }
+    ],
+    "autoload": {
+        "psr-4": {"iDoklad-v2\\": "src/"}
+    },
+    "require": {
+        "php": ">=5.0.0"
+    }
+}
