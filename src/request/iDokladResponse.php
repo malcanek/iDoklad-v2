@@ -74,10 +74,10 @@ class iDokladResponse {
         $this->headers = substr($rawOutput, 0, $headerSize);
         
         $parsed = $this->parseJSON(trim(substr($rawOutput, $headerSize)));
-        $this->data = $parsed['Data'];
-        $this->links = $parsed['Links'];
-        $this->totalItems = $parsed['TotalItems'];
-        $this->totalPages = $parsed['TotalPages'];
+        $this->data = empty($parsed['Data']) ? $parsed : $parsed['Data'];
+        $this->links = empty($parsed['Links']) ? null : $parsed['Links'];
+        $this->totalItems = empty($parsed['TotalItems']) ? null : $parsed['TotalItems'];
+        $this->totalPages = empty($parsed['TotalPages']) ? null : $parsed['TotalPages'];
     }
     
     /**
