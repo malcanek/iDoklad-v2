@@ -1,5 +1,5 @@
 {
-    "name": "martinveverka/idoklad-v2",
+    "name": "malcanek/idoklad-v2",
     "description": "PHP třída pro ulehčení požadavků na iDoklad api v2.",
     "keywords": ["idoklad", "fakturace"],
     "homepage": "https://github.com/malcanek/iDoklad-v2",
