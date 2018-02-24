@@ -13,7 +13,7 @@ try{
     $iDoklad->setCredentialsCallback(function($credentials){
         file_put_contents('credentials.json', $credentials->toJson());
     });
-    if(!file_exists('credentials.json') && empty($_GET['code'])){
+    if(!file_exists('credentials.json') || empty($_GET['code'])){
         $iDoklad->authCCF();
     } 
     $credentials = new iDokladCredentials(file_get_contents('credentials.json'), true);
