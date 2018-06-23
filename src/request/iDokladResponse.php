@@ -59,6 +59,7 @@ class iDokladResponse {
         402 => 'operace vyžaduje zakoupení předplatného',
         403 => 'nutnost přihlášení do webového prostředí iDokladu a vyřešení přechodu na nižší předplatné',
         404 => 'resource nenalezen/špatné Id resourcu',
+        429 => 'překročení limitu api',
         500 => 'interní chyba serveru - v tomto případě kontaktujte naší technickou podporu',
         'no_text' => 'kód nemá přiřazen žádný text'
     );
@@ -138,6 +139,9 @@ class iDokladResponse {
         if($this->getCode() == 400){
             $this->data = $json;
             throw new iDokladException('Request error: '.$json);
+        }
+        if(empty($json)){
+            return array();
         }
         $parsed = json_decode($json, true);
         $le = json_last_error();
