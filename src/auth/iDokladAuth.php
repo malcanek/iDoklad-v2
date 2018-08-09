@@ -121,7 +121,7 @@ class iDokladAuth {
             $params = array('grant_type' => 'refresh_token', 'client_id' => $this->clientId, 'client_secret' => $this->clientSecret, 'scope' => 'idoklad_api%20offline_access', 'refresh_token' => $this->credentials->getRefreshToken(), 'redirect_uri' => $this->redirectUri);
             $json = $this->curl($params);
             if(!empty($json)){
-                $ret = json_encode($json);
+                $ret = json_decode($json);
                 if(!isset($ret['error'])){
                     $this->credentials = new iDokladCredentials($json, true);
                     $this->credentials->addLastValidation(date('Y-m-d H:i:s'));
