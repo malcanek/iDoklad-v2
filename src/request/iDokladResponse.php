@@ -47,6 +47,12 @@ class iDokladResponse {
     private $links;
     
     /**
+     *
+     * @var string
+     */
+    private $type;
+    
+    /**
      * Stores return messages for codes
      * @var array
      */
@@ -70,15 +76,21 @@ class iDokladResponse {
      * @param int $headerSize
      * @param int $code
      */
-    public function __construct($rawOutput, $headerSize, $code) {
+    public function __construct($rawOutput, $headerSize, $code, $httpException = false) {
         $this->code = $code;
         $this->headers = substr($rawOutput, 0, $headerSize);
         
-        $parsed = $this->parseJSON(trim(substr($rawOutput, $headerSize)));
-        $this->data = empty($parsed['Data']) ? $parsed : $parsed['Data'];
-        $this->links = empty($parsed['Links']) ? null : $parsed['Links'];
-        $this->totalItems = empty($parsed['TotalItems']) ? null : $parsed['TotalItems'];
-        $this->totalPages = empty($parsed['TotalPages']) ? null : $parsed['TotalPages'];
+        if($httpException && $code >= 400){
+            throw new iDokladException($this->getCodeText(), $code);
+        }
+        
+        if($code < 300){
+            $parsed = $this->parseJSON(trim(substr($rawOutput, $headerSize)));
+            $this->data = empty($parsed['Data']) ? $parsed : $parsed['Data'];
+            $this->links = empty($parsed['Links']) ? null : $parsed['Links'];
+            $this->totalItems = empty($parsed['TotalItems']) ? null : $parsed['TotalItems'];
+            $this->totalPages = empty($parsed['TotalPages']) ? null : $parsed['TotalPages'];
+        }
     }
     
     /**
@@ -127,6 +139,31 @@ class iDokladResponse {
      */
     public function getLink(){
         return $this->links;
+    }
+    
+    /**
+     * Sets response type e.g. IssuedInvoice
+     * @param string $type
+     */
+    public function setType($type){
+        $this->type = $type;
+    }
+    
+    /**
+     * Returns response type e.g. IssuedInvoice
+     * @return string
+     */
+    public function getType(){
+        return $this->type;
+    }
+    
+    /**
+     * Validates if response is some kind of type e.g. IssuedInvoice
+     * @param string $type
+     * @return boolean
+     */
+    public function is($type){
+        return $this->type == $type;
     }
     
     /**

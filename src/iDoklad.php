@@ -57,6 +57,12 @@ class iDoklad {
     private $langsShortToLong = array('cz' => 'cs-CZ', 'de' => 'de-DE', 'sk' => 'sk-SK', 'en' => 'en-US', 'cs' => 'cs-CZ');
     
     /**
+     * Whether or not to throw exception when request get fail http code
+     * @var boolean
+     */
+    private $httpException = false;
+    
+    /**
      * Initilizes iDoklad object with necessary parameters
      * @param string $clientId
      * @param string $clientSecret
@@ -119,6 +125,20 @@ class iDoklad {
     }
     
     /**
+     * Enable http exceptions
+     */
+    public function httpExceptionsOn(){
+        $this->httpException = true;
+    }
+    
+    /**
+     * Disable http exceptions
+     */
+    public function httpExceptionsOff(){
+        $this->httpException = false;
+    }
+    
+    /**
      * Check if iDokladCredential object has valid informations
      * @throws iDokladException
      */
@@ -172,6 +192,9 @@ class iDoklad {
         $header_size = curl_getinfo($curl, CURLINFO_HEADER_SIZE);
         $status = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         curl_close($curl);
-        return new iDokladResponse($data, $header_size, $status);
+        
+        $response = new iDokladResponse($data, $header_size, $status, $this->httpException);
+        $response->setType(substr($request->getMethod(), 0, strpos($request->getMethod(), '/')));
+        return $response;
     }
 }
