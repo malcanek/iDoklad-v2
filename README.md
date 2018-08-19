@@ -109,6 +109,19 @@ $data = array(
 $request->addPostParameters($data);
 ```
 
+Případně můžeme nově zadat method type pomocí fce, což by nyní vypadalo následovně:
+```php
+$data = array(
+    'PurchaserId' => 3739927,
+    'IssuedInvoiceItems' => [array(
+        'Name' => 'Testovaci polozka',
+        'UnitPrice' => 100,
+        'Amount' => 1
+    )]
+);
+$request->post()->addPostParameters($data);
+```
+
 ## Použití filtru a třídění
 Pro použití filtru použijeme třídu iDokladFilter. Parametry můžeme zadat hned při založení třídy, první parametr je jméno pole, které chceme filtrovat, druhý parametr je operátor, poslední parametr je hodnota.
 ```php
@@ -131,6 +144,12 @@ $request->addSort($sort);
 ```php
 $request->setPage(2);
 $request->setPageSize(5);
+```
+
+## Vyhazování exception při návratových kódech vyšších nebo rovno 400
+Pokud chceme zapnout vyhazování exception při http návratových kódech vyšších rovno 400, stačí nám zavolat fci 
+```php
+$iDoklad->httpExceptionsOn()
 ```
 
 ## Jiné úpravy
