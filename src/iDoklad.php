@@ -150,7 +150,7 @@ class iDoklad {
                 throw new iDokladException('Wrong language selected');
             }
         }
-        if(in_array($request->getMethodType(), ['POST', 'PUT', 'PATCH'])){
+        if(in_array($request->getMethodType(), ['POST', 'PUT', 'PATCH', 'DELETE'])){
             $headers[] = 'Content-Type: application/json';
         }
         $curl_opt = array(
