@@ -306,4 +306,12 @@ class iDokladRequest {
         $this->methodType = 'PATCH';
         return $this;
     }
+    
+    /**
+     * Returns post params
+     * @return array
+     */
+    public function getPostParams(){
+        return $this->postParams;
+    }
 }
