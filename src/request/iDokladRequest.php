@@ -261,4 +261,49 @@ class iDokladRequest {
     public function getLang(){
         return $this->lang;
     }
+    
+    /**
+     * Sets request method type as get
+     * @return \malcanek\iDoklad\request\iDokladRequest
+     */
+    public function get(){
+        $this->methodType = 'GET';
+        return $this;
+    }
+    
+    /**
+     * Sets request method type as post
+     * @return \malcanek\iDoklad\request\iDokladRequest
+     */
+    public function post(){
+        $this->methodType = 'POST';
+        return $this;
+    }
+    
+    /**
+     * Sets request method type as put
+     * @return \malcanek\iDoklad\request\iDokladRequest
+     */
+    public function put(){
+        $this->methodType = 'PUT';
+        return $this;
+    }
+    
+    /**
+     * Sets request method type as delete
+     * @return \malcanek\iDoklad\request\iDokladRequest
+     */
+    public function delete(){
+        $this->methodType = 'DELETE';
+        return $this;
+    }
+    
+    /**
+     * Sets request method type as patch
+     * @return \malcanek\iDoklad\request\iDokladRequest
+     */
+    public function patch(){
+        $this->methodType = 'PATCH';
+        return $this;
+    }
 }
