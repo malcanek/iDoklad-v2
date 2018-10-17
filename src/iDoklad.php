@@ -25,43 +25,43 @@ use malcanek\iDoklad\request\iDokladFilter;
 use malcanek\iDoklad\request\iDokladSort;
 
 class iDoklad {
-    
+
     /**
      * Stores iDokladAuth object
      * @var iDokladAuth
      */
     private $iDokladAuth;
-    
+
     /**
      * URL for commucation with iDoklad api
      * @var string
      */
     private $url = 'https://app.idoklad.cz/developer/api/v2/';
-    
+
     /**
      * Api methods allowed by iDoklad
      * @var array
      */
     private $methodsAllowed = array('GET', 'POST', 'PATCH', 'PUT', 'DELETE');
-    
+
     /**
      * Api langs allowed by iDoklad
      * @var array
      */
     private $langsAllowed = array('en-US', 'de-DE', 'sk-SK', 'cs-CZ');
-    
+
     /**
      * Helper array to get full lang code.
      * @var array
      */
     private $langsShortToLong = array('cz' => 'cs-CZ', 'de' => 'de-DE', 'sk' => 'sk-SK', 'en' => 'en-US', 'cs' => 'cs-CZ');
-    
+
     /**
      * Whether or not to throw exception when request get fail http code
      * @var boolean
      */
     private $httpException = false;
-    
+
     /**
      * Initilizes iDoklad object with necessary parameters
      * @param string $clientId
@@ -75,7 +75,7 @@ class iDoklad {
             $this->iDokladAuth->setCredentials($credentials);
         }
     }
-    
+
     /**
      * Returns url to iDoklad to sign in user and get back code to get credentials
      * @return string
@@ -83,16 +83,16 @@ class iDoklad {
     public function getAuthenticationUrl(){
         return $this->iDokladAuth->getAuthenticationUrl();
     }
-    
+
     /**
      * Requests authentifications credentials based on code returned as callback from url from getAuthenticationUrl() function
      * @param string $code
      */
     public function requestCredentials($code){
         $this->iDokladAuth->loadCode($code);
-        $this->iDokladAuth->auth('oauth2');
+        $this->iDokladAuth->auth(iDokladAuth::AUTH_TYPE_OAUTH2);
     }
-    
+
     /**
      * Returns credential object
      * @return iDokladCredentials
@@ -100,7 +100,7 @@ class iDoklad {
     public function getCredentials(){
         return $this->iDokladAuth->getCredentials();
     }
-    
+
     /**
      * Sets iDokladCredentials object to authenticate users
      * @param iDokladCredentials $credentials
@@ -108,7 +108,7 @@ class iDoklad {
     public function setCredentials(iDokladCredentials $credentials){
         $this->iDokladAuth->setCredentials($credentials);
     }
-    
+
     /**
      * Sets callback function, that is called after iDokladCredentials object change and puts new iDokladCredentials object as parameter
      * @param callable $callback
@@ -116,41 +116,41 @@ class iDoklad {
     public function setCredentialsCallback(callable $callback){
         $this->iDokladAuth->setCredentialsCallback($callback);
     }
-    
+
     /**
      * Authenticates via ccf method
      */
     public function authCCF(){
-        $this->iDokladAuth->auth('ccf');
+        $this->iDokladAuth->auth(iDokladAuth::AUTH_TYPE_CCF);
     }
-    
+
     /**
      * Enable http exceptions
      */
     public function httpExceptionsOn(){
         $this->httpException = true;
     }
-    
+
     /**
      * Disable http exceptions
      */
     public function httpExceptionsOff(){
         $this->httpException = false;
     }
-    
+
     /**
      * Check if iDokladCredential object has valid informations
      * @throws iDokladException
      */
     private function checkAuthToken(){
-        if(empty($this->iDokladAuth->getCredentials()) || empty($this->iDokladAuth->getCredentials()->getAccessToken()) || (empty($this->iDokladAuth->getCredentials()->getRefreshToken()) && $this->iDokladAuth->getCredentials()->getAuthType() == 'oauth2')){
+        if(empty($this->iDokladAuth->getCredentials()) || empty($this->iDokladAuth->getCredentials()->getAccessToken()) || (empty($this->iDokladAuth->getCredentials()->getRefreshToken()) && $this->iDokladAuth->getCredentials()->getAuthType() === iDokladAuth::AUTH_TYPE_OAUTH2)){
             throw new iDokladException('Invalid credentials');
         }
         if($this->iDokladAuth->getCredentials()->isExpired()){
-            $this->iDokladAuth->oauth2Refresh();
+            $this->iDokladAuth->reAuth();
         }
     }
-    
+
     /**
      * Builds and sends request to iDoklad api
      * @param iDokladRequest $request
@@ -180,7 +180,7 @@ class iDoklad {
             CURLOPT_SSL_VERIFYPEER => false,
             CURLOPT_HEADER => 1
         );
-        
+
         if(in_array($request->getMethodType(), $this->methodsAllowed) && $request->getMethodType() != 'GET'){
             $curl_opt[CURLOPT_POSTFIELDS] = $request->buildPostQuery();
             if($request->getMethodType() != 'POST'){
@@ -192,7 +192,7 @@ class iDoklad {
         $header_size = curl_getinfo($curl, CURLINFO_HEADER_SIZE);
         $status = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         curl_close($curl);
-        
+
         $response = new iDokladResponse($data, $header_size, $status, $this->httpException);
         $response->setType(substr($request->getMethod(), 0, strpos($request->getMethod(), '/')));
         return $response;

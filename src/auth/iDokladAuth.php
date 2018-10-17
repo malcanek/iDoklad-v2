@@ -11,55 +11,60 @@ namespace malcanek\iDoklad\auth;
 use malcanek\iDoklad\iDokladException;
 
 class iDokladAuth {
-    
+
+    const AUTH_TYPE_OAUTH2 = 'oauth2';
+
+    const AUTH_TYPE_CCF = 'ccf';
+
+
     /**
      * Holds authorize URL
      * @var string
      */
     private $authorizeUrl = 'https://app.idoklad.cz/identity/server/connect/authorize';
-    
+
     /**
      * Holds token URL
      * @var string
      */
     private $tokenUrl = 'https://app.idoklad.cz/identity/server/connect/token';
-    
+
     /**
      * Holds client id set by developer
      * @var string
      */
     private $clientId;
-    
+
     /**
      * Holds client secret set by developer
      * @var string
      */
     private $clientSecret;
-    
+
     /**
      * Holds redirect URI to get back from authentication url
      * @var string
      */
     private $redirectUri;
-    
+
     /**
      * Holds code when returned from authentication url
      * @var string
      */
     private $code;
-    
+
     /**
      * Holds iDokladCredentials object
      * @var iDokladCredentials
      */
     private $credentials;
-    
+
     /**
      * Holds credentials callback object
      * @var callable
      */
     private $credentialsCallback;
-    
+
     /**
      * Initializes iDokladAuth object
      * @param string $clientId
@@ -71,27 +76,27 @@ class iDokladAuth {
         $this->clientSecret = $clientSecret;
         $this->redirectUri = $redirectUri;
     }
-    
+
     /**
      * Chooses authenticate method and gets credentials
      * @param string $authType
      * @param \malcanek\iDoklad\auth\iDokladCredentials $credentials
      * @throws iDokladException
      */
-    public function auth($authType = 'oauth2', iDokladCredentials $credentials = null) {
+    public function auth($authType = self::AUTH_TYPE_OAUTH2, iDokladCredentials $credentials = null) {
         $this->credentials = $credentials;
         switch ($authType){
-            case 'oauth2':
+            case self::AUTH_TYPE_OAUTH2:
                 $this->oauth2();
                 break;
-            case 'ccf':
+            case self::AUTH_TYPE_CCF:
                 $this->ccf();
                 break;
             default :
-                throw new iDokladException('Unknown access type '.$type.'. (Allowed oauth2, ccf).', 1);
+                throw new iDokladException('Unknown access type '.$authType.'. (Allowed '.self::AUTH_TYPE_OAUTH2.', '.self::AUTH_TYPE_CCF.').', 1);
         }
     }
-    
+
     /**
      * Provides oauth2 authentication and in case of success returns iDokladCredentials object
      * @return iDokladCredentials
@@ -110,7 +115,7 @@ class iDokladAuth {
             return $this->credentials;
         }
     }
-    
+
     /**
      * Refreshes access token after expiration
      * @return iDokladCredentials
@@ -121,20 +126,33 @@ class iDokladAuth {
             $params = array('grant_type' => 'refresh_token', 'client_id' => $this->clientId, 'client_secret' => $this->clientSecret, 'scope' => 'idoklad_api%20offline_access', 'refresh_token' => $this->credentials->getRefreshToken(), 'redirect_uri' => $this->redirectUri);
             $json = $this->curl($params);
             if(!empty($json)){
-                $ret = json_decode($json);
+                $ret = json_decode($json, true);
                 if(!isset($ret['error'])){
                     $this->credentials = new iDokladCredentials($json, true);
                     $this->credentials->addLastValidation(date('Y-m-d H:i:s'));
-                    $this->credentials->setAuthType('oauth2');
+                    $this->credentials->setAuthType(self::AUTH_TYPE_OAUTH2);
                     $this->callCredentialsCallback();
                     return $this->credentials;
                 } else {
-                    throw new iDokladException('Error occured while refreshing token. Message: '.$ret['error']);
+                    throw new iDokladException('Error occurred while refreshing token. Message: '.$ret['error']);
                 }
             }
         }
     }
-    
+
+    public function reAuth(){
+        switch ($this->getCredentials()->getAuthType()) {
+            case self::AUTH_TYPE_OAUTH2:
+                $this->oauth2Refresh();
+                break;
+            case self::AUTH_TYPE_CCF:
+                $this->auth(self::AUTH_TYPE_CCF);
+                break;
+            default :
+                throw new iDokladException('Unknown access type ' . $this->getCredentials()->getAuthType() . '. (Allowed ' . self::AUTH_TYPE_OAUTH2 . ', ' . self::AUTH_TYPE_CCF . ').', 1);
+        }
+    }
+
     /**
      * Authenticates user by ccf method
      * @return iDokladCredentials
@@ -144,11 +162,11 @@ class iDokladAuth {
         $json = $this->curl($params);
         $this->credentials = new iDokladCredentials($json, true);
         $this->credentials->addLastValidation(date('Y-m-d H:i:s'));
-        $this->credentials->setAuthType('ccf');
+        $this->credentials->setAuthType(self::AUTH_TYPE_CCF);
         $this->callCredentialsCallback();
         return $this->credentials;
     }
-    
+
     /**
      * Provides curl to get authentication json
      * @param array $params
@@ -167,7 +185,7 @@ class iDokladAuth {
         curl_close($curl);
         return $data;
     }
-    
+
     /**
      * Returns authenticaion URL
      * @return string
@@ -175,7 +193,7 @@ class iDokladAuth {
     public function getAuthenticationUrl(){
         return $this->authorizeUrl.'?scope=idoklad_api%20offline_access&response_type=code&client_id='.$this->clientId.'&redirect_uri='.$this->redirectUri;
     }
-    
+
     /**
      * Sets code returned by callback from authentication URL
      * @param string $code
@@ -183,7 +201,7 @@ class iDokladAuth {
     public function loadCode($code){
         $this->code = $code;
     }
-    
+
     /**
      * Returns iDokladCredentials
      * @return iDokladCredentials
@@ -191,7 +209,7 @@ class iDokladAuth {
     public function getCredentials(){
         return $this->credentials;
     }
-    
+
     /**
      * Calls callback function after credetials change
      */
@@ -200,7 +218,7 @@ class iDokladAuth {
             call_user_func($this->credentialsCallback, $this->credentials);
         }
     }
-    
+
     /**
      * Sets iDokladCredentials to provide authentication
      * @param \malcanek\iDoklad\auth\iDokladCredentials $credentials
@@ -208,7 +226,7 @@ class iDokladAuth {
     public function setCredentials(iDokladCredentials $credentials){
         $this->credentials = $credentials;
     }
-    
+
     /**
      * Sets callback function that is called after credentials change
      * @param callable $callback

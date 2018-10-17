@@ -8,6 +8,8 @@
 
 namespace malcanek\iDoklad\auth;
 
+use malcanek\iDoklad\iDokladException;
+
 class iDokladCredentials {
     
     /**
