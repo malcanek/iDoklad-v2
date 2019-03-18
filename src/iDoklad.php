@@ -163,9 +163,9 @@ class iDoklad {
         $headers = array('Authorization: Bearer '.$this->iDokladAuth->getCredentials()->getAccessToken());
         if($request->getLang() != null){
             if(in_array($request->getLang(), $this->langsAllowed)){
-                $headers[] = 'Accept-Lanuage: '.$request->getLang();
-            } elseif(in_array($request->getLang(), $this->langsShortToLong)) {
-                $headers[] = 'Accept-Lanuage: '.$this->langsShortToLong[$request->getLang()];
+                $headers[] = 'Accept-Language: '.$request->getLang();
+            } elseif(array_key_exists($request->getLang(), $this->langsShortToLong)) {
+                $headers[] = 'Accept-Language: '.$this->langsShortToLong[$request->getLang()];
             } else {
                 throw new iDokladException('Wrong language selected');
             }
