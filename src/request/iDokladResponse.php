@@ -84,7 +84,7 @@ class iDokladResponse {
             throw new iDokladException($this->getCodeText(), $code);
         }
         
-        if($code < 300){
+        if($code < 300 || $code == 400){
             $parsed = $this->parseJSON(trim(substr($rawOutput, $headerSize)));
             $this->data = empty($parsed['Data']) ? $parsed : $parsed['Data'];
             $this->links = empty($parsed['Links']) ? null : $parsed['Links'];
