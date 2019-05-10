@@ -174,7 +174,6 @@ class iDokladResponse {
      */
     private function parseJSON($json){
         if($this->getCode() == 400){
-            $this->data = $json;
             throw new iDokladException('Request error: '.$json);
         }
         if(empty($json)){
