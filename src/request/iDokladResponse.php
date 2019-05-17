@@ -174,6 +174,14 @@ class iDokladResponse {
     }
     
     /**
+     * Get raw response from iDoklad
+     * @return string
+     */
+    public function getRaw() {
+        return $this->raw;
+    }
+    
+    /**
      * Parses json string
      * @param string $json
      * @return array
