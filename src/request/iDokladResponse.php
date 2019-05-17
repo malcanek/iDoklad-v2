@@ -53,6 +53,12 @@ class iDokladResponse {
     private $type;
     
     /**
+     * JSON
+     * @var string
+     */
+    private $raw;
+    
+    /**
      * Stores return messages for codes
      * @var array
      */
@@ -79,13 +85,14 @@ class iDokladResponse {
     public function __construct($rawOutput, $headerSize, $code, $httpException = false) {
         $this->code = $code;
         $this->headers = substr($rawOutput, 0, $headerSize);
+        $this->raw = trim(substr($rawOutput, $headerSize));
         
         if($httpException && $code >= 400){
-            throw new iDokladException($this->getCodeText(), $code);
+            throw new iDokladException($this->getCodeText(), $code, $this->raw);
         }
         
         if($code < 300){
-            $parsed = $this->parseJSON(trim(substr($rawOutput, $headerSize)));
+            $parsed = $this->parseJSON($this->raw);
             $this->data = empty($parsed['Data']) ? $parsed : $parsed['Data'];
             $this->links = empty($parsed['Links']) ? null : $parsed['Links'];
             $this->totalItems = empty($parsed['TotalItems']) ? null : $parsed['TotalItems'];
@@ -173,10 +180,6 @@ class iDokladResponse {
      * @throws iDokladException
      */
     private function parseJSON($json){
-        if($this->getCode() == 400){
-            $this->data = $json;
-            throw new iDokladException('Request error: '.$json);
-        }
         if(empty($json)){
             return array();
         }
@@ -191,7 +194,7 @@ class iDokladResponse {
                 JSON_ERROR_SYNTAX => 'Syntax error',
                 JSON_ERROR_UTF8 => 'Malformed UTF-8 characters, possibly incorrectly encoded'
             );
-            throw new iDokladException('JSON error: '.(isset($errors[$le]) ? $errors[$le] : 'Unknown error'), $le);
+            throw new iDokladException('JSON error: '.(isset($errors[$le]) ? $errors[$le] : 'Unknown error'), $le, $json);
         }
         return $parsed;
     }
