@@ -3,6 +3,9 @@
 PHP třída pro zasílání požadavků na iDoklad api v2.
 [Dokumentace iDoklad api v2](https://app.idoklad.cz/Developer/Help)
 
+## Informace ohledně api v3
+V současné době neplánuji migraci na api v3, jelikož api v2 postačuje mým potřebám. Jelikož v současné době není plánováno vypnutí api v2 nepovažuji migraci na api v3 za akutní. Dle specifikace api v3 by měla většina funkcí této knihovny fungovat také na v3 endpointy, je ale potřeba změnit autentifikaci a verzi api v kódu, tudíž je potřeba fork této knihovny. Děkuji za pochopení.
+
 ## Vložení knihovny do projektu
 Knihovnu vložíme do projektu naincludováním souboru src/iDoklad.php, nebo si knihovnu přidáme pomocí composeru. Následně se na knihovnu odkážeme pomocí use.
 ```php
