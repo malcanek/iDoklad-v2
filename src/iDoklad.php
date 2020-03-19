@@ -170,7 +170,10 @@ class iDoklad {
                 throw new iDokladException('Wrong language selected');
             }
         }
-        if(in_array($request->getMethodType(), ['POST', 'PUT', 'PATCH', 'DELETE']) || !empty(($request->getPostParams()))){
+
+        if($request->isAttachement()) {
+            $headers[] = 'Content-Type: multipart/form-data';
+        } elseif(in_array($request->getMethodType(), ['POST', 'PUT', 'PATCH', 'DELETE']) || !empty(($request->getPostParams()))){
             $headers[] = 'Content-Type: application/json';
         }
         $curl_opt = array(
@@ -181,7 +184,10 @@ class iDoklad {
             CURLOPT_HEADER => 1
         );
 
-        if(in_array($request->getMethodType(), $this->methodsAllowed) && $request->getMethodType() != 'GET'){
+        if($request->isAttachement()) {
+            $curl_opt[CURLOPT_POSTFIELDS] = ['FileBytes' => $request->getFile()];
+            $curl_opt[CURLOPT_CUSTOMREQUEST] = 'PUT';
+        } elseif(in_array($request->getMethodType(), $this->methodsAllowed) && $request->getMethodType() != 'GET'){
             $curl_opt[CURLOPT_POSTFIELDS] = $request->buildPostQuery();
             if($request->getMethodType() != 'POST'){
                 $curl_opt[CURLOPT_CUSTOMREQUEST] = $request->getMethodType();

@@ -57,6 +57,18 @@ class iDokladRequest {
      * @var string
      */
     private $lang = null;
+    
+    /**
+     * Holds file for cases when we want to send attachement
+     * @var CURLFile
+     */
+    private $file = null;
+    
+    /**
+     * Detects if attachement is being send
+     * @var bool
+     */
+    private $sendAttachement = false;
 
     /**
      * Optionally initializes request parameters
@@ -161,6 +173,17 @@ class iDokladRequest {
      */
     public function addSort(iDokladSort $sort){
         $this->sorts[] = $sort;
+        return $this;
+    }
+    
+    /**
+     * 
+     * @param CURLFile $file
+     * @return \malcanek\iDoklad\request\iDokladRequest
+     */
+    public function addFile(\CURLFile $file) {
+        $this->file = $file;
+        $this->sendAttachement = true;
         return $this;
     }
     
@@ -313,5 +336,21 @@ class iDokladRequest {
      */
     public function getPostParams(){
         return $this->postParams;
+    }
+    
+    /**
+     * Return file
+     * @return CURLFile
+     */
+    public function getFile() {
+        return $this->file;
+    }
+    
+    /**
+     * Returns if we are sending attachement
+     * @return bool
+     */
+    public function isAttachement() {
+        return $this->sendAttachement;
     }
 }
