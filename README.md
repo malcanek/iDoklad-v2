@@ -152,6 +152,14 @@ Pokud chceme zapnout vyhazování exception při http návratových kódech vyš
 $iDoklad->httpExceptionsOn()
 ```
 
+## Upload přílohy
+Pokud chceme uploadovat přílohu, stačí nám použít metodu addFile nad request objektem.
+```php
+$request = new \malcanek\iDoklad\request\iDokladRequest('Attachments/{documentId}/{documentType}');
+$request->addFile(new CURLFile(path_to_your_file));
+$response = $iDoklad->sendRequest($request);
+```
+
 ## Jiné úpravy
 Pokud potřebujeme použít metody POST, PUT, PATCH, DELETE, použijeme k tomu metodu addMethodType nad objektem iDokladRequest.
 
