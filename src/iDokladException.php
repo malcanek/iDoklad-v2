@@ -12,7 +12,7 @@ use Exception;
 class iDokladException extends Exception {
     private $payload;
 
-    public function __construct($message = "", $code = 0, $payload) {
+    public function __construct($message = "", $code = 0, $payload = null) {
         $this->payload = $payload;
         parent::__construct($message, $code);
     }
