@@ -198,9 +198,11 @@ class iDoklad {
         $header_size = curl_getinfo($curl, CURLINFO_HEADER_SIZE);
         $status = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         curl_close($curl);
+        
+        $type = substr($request->getMethod(), 0, strpos($request->getMethod(), '/'));
 
-        $response = new iDokladResponse($data, $header_size, $status, $this->httpException);
-        $response->setType(substr($request->getMethod(), 0, strpos($request->getMethod(), '/')));
+        $response = new iDokladResponse($data, $header_size, $status, $this->httpException, $type === 'Attachments' || $request->isBinary());
+        $response->setType($type);
         return $response;
     }
 }

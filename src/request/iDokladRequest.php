@@ -69,6 +69,12 @@ class iDokladRequest {
      * @var bool
      */
     private $sendAttachement = false;
+    
+    /**
+     * Indicates that response will be binary Base64 encoded file
+     * @var boolean
+     */
+    private $isBinary = false;
 
     /**
      * Optionally initializes request parameters
@@ -352,5 +358,21 @@ class iDokladRequest {
      */
     public function isAttachement() {
         return $this->sendAttachement;
+    }
+    
+    /**
+     * Indicates that response will be binary Base64 encoded file
+     */
+    public function binary() {
+        $this->isBinary = true;
+        return $this;
+    }
+    
+    /**
+     * Returns if response is going to be binary
+     * @return boolean
+     */
+    public function isBinary() {
+        return $this->isBinary;
     }
 }

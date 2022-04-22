@@ -82,7 +82,7 @@ class iDokladResponse {
      * @param int $headerSize
      * @param int $code
      */
-    public function __construct($rawOutput, $headerSize, $code, $httpException = false) {
+    public function __construct($rawOutput, $headerSize, $code, $httpException = false, $binary = false) {
         $this->code = $code;
         $this->headers = substr($rawOutput, 0, $headerSize);
         $this->raw = trim(substr($rawOutput, $headerSize));
@@ -91,7 +91,7 @@ class iDokladResponse {
             throw new iDokladException($this->getCodeText(), $code, $this->raw);
         }
         
-        if($code < 300){
+        if($code < 300 && !$binary){
             $parsed = $this->parseJSON($this->raw);
             $this->data = empty($parsed['Data']) ? $parsed : $parsed['Data'];
             $this->links = empty($parsed['Links']) ? null : $parsed['Links'];
