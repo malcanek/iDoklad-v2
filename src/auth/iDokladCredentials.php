@@ -23,6 +23,11 @@ class iDokladCredentials {
      * @var string
      */
     private $access_token;
+
+    /**
+     * @var string
+     */
+    private $token_type;
     
     /**
      * Time after which access token expires
@@ -41,7 +46,7 @@ class iDokladCredentials {
      * @var string
      */
     private $authType = 'oauth2';
-    
+
     /**
      * Initializes iDokladCredentials object and loads data
      * @param json|array $client
@@ -112,7 +117,9 @@ class iDokladCredentials {
     public function loadFromJson($json){
         $arr = json_decode($json, true);
         foreach($arr as $key => $val){
-            $this->$key = $val;
+            if (property_exists($this, $key)){
+                $this->$key = $val;
+            }
         }
     }
     
